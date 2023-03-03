@@ -1,4 +1,4 @@
-2D Platformer Microgame - Version 3.0.0
+2D Platformer Microgame - Version 4.0.0
 =======================================
 
 This is the 2D Platformer Microgame. Learn the basics of creating and modifying a 2D sprite-based platformer game.
@@ -6,6 +6,16 @@ Learn more about the project here: https://assetstore.unity.com/packages/templat
 
 Changelog
 ---------
+## [4.0.1] - 2022-08-17
+
+### Fixed
+- Incorrect tutorial text fixed
+
+## [4.0.0] - 2022-04-05
+
+### Changed
+- Update project to 2021.3.0f1
+
 ## [3.0.0] - 2022-02-21
 
 ### Changed

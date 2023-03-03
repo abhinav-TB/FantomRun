@@ -61,7 +61,7 @@ MonoBehaviour:
       Title:
         m_Untranslated: 
       Text:
-        m_Untranslated: 'Select <b>Tutorial 2: Change colors</b> to continue directly,
+        m_Untranslated: 'Select <b>Tutorial 3: Change colors</b> to continue directly,
           or <b>Done</b> to return to the tutorial overview.'
       m_Tutorial: {fileID: 11400000, guid: 5d0306ad1c1d347ed8eb91190a9e45c2, type: 2}
       m_Image: {fileID: 0}
