@@ -19,13 +19,22 @@ contract TokenStaker is Ownable, ReentrancyGuard {
   IERC20 public stakingToken;
   IERC20 public rewardToken;
   IERC1155 public NFTcontract;
+  // APR
+  mapping(StakingTier => uint8) public rewardRate;
+  // months
+  mapping(StakingTier => uint8) public lockupPeriod;
+
+  uint256 private constant MONTH = 60*60*24*30;
+  uint256 private constant YEAR = MONTH*12;
 
   uint256 private _totalStaked;
   mapping(address => uint256) private _stakeBalances;
-  mapping(StakingTier => uint8) private _rewardRate;
+  mapping(address => uint256) private _depositTime;
+  mapping(address => uint256) private _lastUpdatedTime;
 
   event Staked(address user, uint256 amount);
   event Withdrawn(address user, uint256 amount);
+  event ClaimedReward(address user, uint256 amount);
   
   constructor(
     address _stakingToken,
@@ -35,31 +44,63 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     stakingToken = IERC20(_stakingToken);
     rewardToken = IERC20(_rewardToken);
     NFTcontract = IERC1155(_NFTcontract);
-    _rewardRate[StakingTier.Tier1] = 8;
-    _rewardRate[StakingTier.Tier2] = 6;
-    _rewardRate[StakingTier.Tier3] = 4;
-    _rewardRate[StakingTier.Tier4] = 2;
+
+    rewardRate[StakingTier.Tier1] = 10;
+    rewardRate[StakingTier.Tier2] = 8;
+    rewardRate[StakingTier.Tier3] = 5;
+    rewardRate[StakingTier.Tier4] = 2;
+
+    lockupPeriod[StakingTier.Tier1] = 24;
+    lockupPeriod[StakingTier.Tier2] = 18;
+    lockupPeriod[StakingTier.Tier3] = 12;
+    lockupPeriod[StakingTier.Tier4] = 6;
   }
 
   function stake(uint256 amount) external {
     require(amount > 0, "Invalid amount");
+    if (_stakeBalances[msg.sender] == 0) {
+      _depositTime[msg.sender] = block.timestamp;
+    }
+    _lastUpdatedTime[msg.sender] = block.timestamp;
     _stake(amount);
   }
 
   function withdraw(uint256 amount) external {
     require(amount > 0, "Invalid amount");
+    require((block.timestamp - _depositTime[msg.sender]) 
+              >= lockupPeriod[getStakingTier(msg.sender)] * MONTH,
+              "Withdrawal not active"
+            );
+    _depositTime[msg.sender] = 0;
     _withdraw(amount);
+  }
+
+  function claimReward() external {
+    uint256 amount = unclaimedReward(msg.sender);
+    _lastUpdatedTime[msg.sender] = block.timestamp;
+    rewardToken.safeTransfer(msg.sender, amount);
+    emit ClaimedReward(msg.sender, amount);
+  }
+
+  function setRewardRate(StakingTier tier, uint8 rate) external onlyOwner {
+    require(rate > 0, "Cannot be 0");
+    rewardRate[tier] = rate;
+  }
+
+  function setLockupPeriod(StakingTier tier, uint8 months) external onlyOwner {
+    require(months > 0, "Cannot be 0");
+    lockupPeriod[tier] = months;
   }
 
   function totalStaked() external view returns (uint256) {
     return _totalStaked;
   }
 
-  function stakeBalanceOf(address user) external view returns (uint256) {
+  function stakeBalanceOf(address user) public view returns (uint256) {
     return _stakeBalances[user];
   }
 
-  function userTier(address account) public view returns (StakingTier) {
+  function getStakingTier(address account) public view returns (StakingTier) {
     StakingTier _userTier = StakingTier.Tier4;
     if (NFTcontract.balanceOf(account, 4) != 0) {
       _userTier = StakingTier.Tier1;
@@ -71,9 +112,18 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     return _userTier;
   }
 
-  function rewardRate(address account) public view returns (uint8) {
-    StakingTier _userTier = userTier(account);
-    return _rewardRate[_userTier];
+  function getRewardRate(address account) public view returns (uint8) {
+    StakingTier _userTier = getStakingTier(account);
+    return rewardRate[_userTier];
+  }
+
+  function unclaimedReward(address account) public view returns (uint256) {
+    require(_stakeBalances[account] > 0, "Not staking");
+    uint256 rewardAmount =  (_stakeBalances[account] 
+                              * getRewardRate(account) 
+                              * (block.timestamp - _lastUpdatedTime[account])
+                            ) / (YEAR * 100);
+    return rewardAmount;
   }
 
   function _stake(uint256 amount) private nonReentrant {
