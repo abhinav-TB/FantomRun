@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "hardhat-abi-exporter";
 dotenv.config();
 
 const accounts = {
@@ -44,6 +45,12 @@ const config: HardhatUserConfig = {
       ftmTestnet: process.env.API_KEY || "",
       opera: process.env.API_KEY || ""
     }
+  },
+  abiExporter: {
+    path: './abis',
+    runOnCompile: true,
+    clear: true,
+    only: ['TokenStaker'],
   }
 };
 

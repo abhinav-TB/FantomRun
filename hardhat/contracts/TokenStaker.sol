@@ -56,6 +56,18 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     lockupPeriod[StakingTier.Tier4] = 6;
   }
 
+  function setStakingToken(address _stakingToken) external onlyOwner {
+    stakingToken = IERC20(_stakingToken);
+  }
+
+  function setRewardToken(address _rewardToken) external onlyOwner {
+    rewardToken = IERC20(_rewardToken);
+  }
+
+  function setNFTcontract(address _NFTcontract) external onlyOwner {
+    NFTcontract = IERC1155(_NFTcontract);
+  }
+
   function stake(uint256 amount) external {
     require(amount > 0, "Invalid amount");
     if (_stakeBalances[msg.sender] == 0) {

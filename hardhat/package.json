@@ -14,6 +14,7 @@
     "@openzeppelin/contracts": "^4.8.1",
     "@uniswap/v3-staker": "^1.0.2",
     "dotenv": "^16.0.3",
-    "hardhat": "^2.12.7"
+    "hardhat": "^2.12.7",
+    "hardhat-abi-exporter": "^2.10.1"
   }
 }
