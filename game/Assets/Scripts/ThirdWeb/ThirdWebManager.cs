@@ -145,7 +145,7 @@ namespace Platformer.ThirdWeb {
 
 #if !UNITY_EDITOR
                 // Initialize the ThirdWeb SDK and wallet connection event listeners
-                _sdk = new ThirdwebSDK("Mumbai");
+                _sdk = new ThirdwebSDK("Fantom");
                 _coinContract = _sdk.GetContract(coinContractAddress);
                 _characterContract = _sdk.GetContract(characterContractAddress, "edition-drop");
 
