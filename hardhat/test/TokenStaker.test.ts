@@ -64,21 +64,21 @@ describe("TokenStaker", function () {
       expect(await tokenStaker.getStakingTier(wallet1.address)).to.equal(3);
       expect(await tokenStaker.getRewardRate(wallet1.address)).to.equal(2);
 
-      await airdropNFT.mint(wallet2.address, 2, 1, '0x');
+      await airdropNFT.mint(wallet2.address, 1, 1, '0x');
       expect(await tokenStaker.getStakingTier(wallet2.address)).to.equal(2);
       expect(await tokenStaker.getRewardRate(wallet2.address)).to.equal(4);
 
-      await airdropNFT.mint(wallet1.address, 3, 1, '0x');
+      await airdropNFT.mint(wallet1.address, 2, 1, '0x');
       expect(await tokenStaker.getStakingTier(wallet1.address)).to.equal(1);
       expect(await tokenStaker.getRewardRate(wallet1.address)).to.equal(6);
 
-      await airdropNFT.mint(wallet2.address, 4, 1, '0x');
+      await airdropNFT.mint(wallet2.address, 3, 1, '0x');
       expect(await tokenStaker.getStakingTier(wallet2.address)).to.equal(0);
       expect(await tokenStaker.getRewardRate(wallet2.address)).to.equal(8);
     });
 
     it("Calculates number of months remaining", async function () {
-      await airdropNFT.mint(wallet1.address, 3, 1, '0x');
+      await airdropNFT.mint(wallet1.address, 2, 1, '0x');
       await airdropToken.connect(wallet1).increaseAllowance(tokenStaker.address, ethers.utils.parseEther("1000"));
       await tokenStaker.connect(wallet1).stake(ethers.utils.parseEther("1000"));
 
@@ -102,7 +102,7 @@ describe("TokenStaker", function () {
 
   describe("Rewards", function () {
     beforeEach(async () => {
-      await airdropNFT.mint(wallet1.address, 3, 1, '0x');
+      await airdropNFT.mint(wallet1.address, 2, 1, '0x');
       await airdropToken.connect(wallet1).increaseAllowance(tokenStaker.address, ethers.utils.parseEther("1000"));
       await tokenStaker.connect(wallet1).stake(ethers.utils.parseEther("1000"));
 
@@ -140,7 +140,7 @@ describe("TokenStaker", function () {
 
   describe("Withdrawal", function () {
     beforeEach(async () => {
-      await airdropNFT.mint(wallet1.address, 3, 1, '0x');
+      await airdropNFT.mint(wallet1.address, 2, 1, '0x');
       await airdropToken.connect(wallet1).increaseAllowance(tokenStaker.address, ethers.utils.parseEther("1000"));
       await tokenStaker.connect(wallet1).stake(ethers.utils.parseEther("1000"));
 

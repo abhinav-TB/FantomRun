@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "compile": "hardhat compile",
+    "deploy:testnet": "hardhat run ./scripts/deploy.ts --network testnet",
     "test": "hardhat test"
   },
   "keywords": [],

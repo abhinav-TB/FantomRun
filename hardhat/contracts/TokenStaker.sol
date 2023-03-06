@@ -114,11 +114,11 @@ contract TokenStaker is Ownable, ReentrancyGuard {
 
   function getStakingTier(address account) public view returns (StakingTier) {
     StakingTier _userTier = StakingTier.Tier4;
-    if (NFTcontract.balanceOf(account, 4) != 0) {
+    if (NFTcontract.balanceOf(account, 3) != 0) {
       _userTier = StakingTier.Tier1;
-    } else if (NFTcontract.balanceOf(account, 3) != 0) {
-      _userTier = StakingTier.Tier2;
     } else if (NFTcontract.balanceOf(account, 2) != 0) {
+      _userTier = StakingTier.Tier2;
+    } else if (NFTcontract.balanceOf(account, 1) != 0) {
       _userTier = StakingTier.Tier3;
     }
     return _userTier;
