@@ -93,26 +93,26 @@ namespace Platformer.ThirdWeb {
         }
 
         public static bool IsAirdropCharacterOwner() {
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
+            return true;
+#endif
             int airdropCharacterId = CharacterManager.AirdropCharacter.Item3;
             if (_characterOwnership.ContainsKey(airdropCharacterId)) {
                 return _characterOwnership[airdropCharacterId];
             }
 
             return false;
-#endif
-            return true;
         }
 
         public static bool IsCharacterOwner(int characterId) {
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
+            return true;
+#endif
             if (_characterOwnership.ContainsKey(characterId)) {
                 return _characterOwnership[characterId];
             }
 
             return false;
-#endif
-            return true;
         }
 
         public static float GetCoinBalance() {
@@ -143,9 +143,12 @@ namespace Platformer.ThirdWeb {
                 ShouldDataBeRefreshed = true;
                 _isAuthenticated = false;
 
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
+                return;
+#endif
+
                 // Initialize the ThirdWeb SDK and wallet connection event listeners
-                _sdk = new ThirdwebSDK("Fantom");
+                _sdk = new ThirdwebSDK("fantom-testnet");
                 _coinContract = _sdk.GetContract(coinContractAddress);
                 _characterContract = _sdk.GetContract(characterContractAddress, "edition-drop");
 
@@ -155,7 +158,6 @@ namespace Platformer.ThirdWeb {
                 // Set GameObject and AuthPanel to not be destroyed on scene load
                 DontDestroyOnLoad(this.gameObject);
                 DontDestroyOnLoad(authPanelCanvas);
-#endif
             }
         }
 
