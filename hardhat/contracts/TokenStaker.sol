@@ -45,15 +45,27 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     rewardToken = IERC20(_rewardToken);
     NFTcontract = IERC1155(_NFTcontract);
 
-    rewardRate[StakingTier.Tier1] = 10;
-    rewardRate[StakingTier.Tier2] = 8;
-    rewardRate[StakingTier.Tier3] = 5;
+    rewardRate[StakingTier.Tier1] = 8;
+    rewardRate[StakingTier.Tier2] = 6;
+    rewardRate[StakingTier.Tier3] = 4;
     rewardRate[StakingTier.Tier4] = 2;
 
     lockupPeriod[StakingTier.Tier1] = 24;
     lockupPeriod[StakingTier.Tier2] = 18;
     lockupPeriod[StakingTier.Tier3] = 12;
     lockupPeriod[StakingTier.Tier4] = 6;
+  }
+
+  function setStakingToken(address _stakingToken) external onlyOwner {
+    stakingToken = IERC20(_stakingToken);
+  }
+
+  function setRewardToken(address _rewardToken) external onlyOwner {
+    rewardToken = IERC20(_rewardToken);
+  }
+
+  function setNFTcontract(address _NFTcontract) external onlyOwner {
+    NFTcontract = IERC1155(_NFTcontract);
   }
 
   function stake(uint256 amount) external {
@@ -124,6 +136,16 @@ contract TokenStaker is Ownable, ReentrancyGuard {
                               * (block.timestamp - _lastUpdatedTime[account])
                             ) / (YEAR * 100);
     return rewardAmount;
+  }
+
+  function getMonthsRemaining(address account) public view returns (uint8) {
+    require(_stakeBalances[account] > 0, "Not staking");
+    if (block.timestamp > _depositTime[account] + lockupPeriod[getStakingTier(account)] * MONTH) {
+      return 0;
+    } else {
+      return uint8(((_depositTime[account] + lockupPeriod[getStakingTier(account)] * MONTH)
+                      - block.timestamp) / MONTH);
+    }
   }
 
   function _stake(uint256 amount) private nonReentrant {
