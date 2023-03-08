@@ -60,7 +60,7 @@ Fantom Run also provides provision for staking the earned tokens. Some of the be
 | Contract | Deployment  |
 | :----- | :- |
 | TokenStaker  | [`0x7CB86B01c79d26e85F5145236d11d37F80703150`](https://testnet.ftmscan.com/address/0x7CB86B01c79d26e85F5145236d11d37F80703150) |
-| AirdropToken | [`0x6Fdfd3F45d62A8CAB216a9C8dFE3077CCe544d8b`](https://testnet.ftmscan.com/address/0x6Fdfd3F45d62A8CAB216a9C8dFE3077CCe544d8b)|
+| AirdropToken | [`0x1c598227895038F4Eb9518AA828BA0e9d16d6c34`](https://testnet.ftmscan.com/address/0x1c598227895038F4Eb9518AA828BA0e9d16d6c34)|
 
 
 ### Details
