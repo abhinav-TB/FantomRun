@@ -2,11 +2,11 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TokenStaker is Ownable, ReentrancyGuard {
+contract TokenStaker is ERC1155, Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20;
 
   enum StakingTier {
@@ -18,7 +18,6 @@ contract TokenStaker is Ownable, ReentrancyGuard {
 
   IERC20 public stakingToken;
   IERC20 public rewardToken;
-  IERC1155 public NFTcontract;
   // APR
   mapping(StakingTier => uint8) public rewardRate;
   // months
@@ -39,11 +38,10 @@ contract TokenStaker is Ownable, ReentrancyGuard {
   constructor(
     address _stakingToken,
     address _rewardToken,
-    address _NFTcontract
-  ) {
+    string memory baseURI
+  ) ERC1155(baseURI) {
     stakingToken = IERC20(_stakingToken);
     rewardToken = IERC20(_rewardToken);
-    NFTcontract = IERC1155(_NFTcontract);
 
     rewardRate[StakingTier.Tier1] = 8;
     rewardRate[StakingTier.Tier2] = 6;
@@ -64,26 +62,13 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     rewardToken = IERC20(_rewardToken);
   }
 
-  function setNFTcontract(address _NFTcontract) external onlyOwner {
-    NFTcontract = IERC1155(_NFTcontract);
-  }
-
   function stake(uint256 amount) external {
     require(amount > 0, "Invalid amount");
-    if (_stakeBalances[msg.sender] == 0) {
-      _depositTime[msg.sender] = block.timestamp;
-    }
-    _lastUpdatedTime[msg.sender] = block.timestamp;
     _stake(amount);
   }
 
   function withdraw(uint256 amount) external {
     require(amount > 0, "Invalid amount");
-    require((block.timestamp - _depositTime[msg.sender]) 
-              >= lockupPeriod[getStakingTier(msg.sender)] * MONTH,
-              "Withdrawal not active"
-            );
-    _depositTime[msg.sender] = 0;
     _withdraw(amount);
   }
 
@@ -92,6 +77,19 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     _lastUpdatedTime[msg.sender] = block.timestamp;
     rewardToken.safeTransfer(msg.sender, amount);
     emit ClaimedReward(msg.sender, amount);
+  }
+
+  function stakeAndClaimNFT(uint256 id) public {
+    require(id <= 3, "Invalid token ID");
+    require(balanceOf(msg.sender, id) == 0, "Already owns NFT");
+    if (id == 1) {
+      _stake(50 ether);
+    } else if (id == 2) {
+      _stake(100 ether);
+    } else if (id == 3) {
+      _stake(150 ether);
+    }
+    _mint(msg.sender, id, 1, '0x');
   }
 
   function setRewardRate(StakingTier tier, uint8 rate) external onlyOwner {
@@ -108,17 +106,35 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     return _totalStaked;
   }
 
+  function setURI(string memory newuri) public onlyOwner {
+    _setURI(newuri);
+  }
+
+  function mint(address account, uint256 id, uint256 amount, bytes memory data)
+    public
+    onlyOwner
+  {
+    _mint(account, id, amount, data);
+  }
+
+  function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    public
+    onlyOwner
+  {
+    _mintBatch(to, ids, amounts, data);
+  }
+
   function stakeBalanceOf(address user) public view returns (uint256) {
     return _stakeBalances[user];
   }
 
   function getStakingTier(address account) public view returns (StakingTier) {
     StakingTier _userTier = StakingTier.Tier4;
-    if (NFTcontract.balanceOf(account, 3) != 0) {
+    if (balanceOf(account, 3) != 0) {
       _userTier = StakingTier.Tier1;
-    } else if (NFTcontract.balanceOf(account, 2) != 0) {
+    } else if (balanceOf(account, 2) != 0) {
       _userTier = StakingTier.Tier2;
-    } else if (NFTcontract.balanceOf(account, 1) != 0) {
+    } else if (balanceOf(account, 1) != 0) {
       _userTier = StakingTier.Tier3;
     }
     return _userTier;
@@ -148,7 +164,15 @@ contract TokenStaker is Ownable, ReentrancyGuard {
     }
   }
 
+  function tokenURI(uint256 id) public view returns (string memory) {
+    return string(abi.encodePacked(uri(id), uint2str(id), ".png"));
+  }
+
   function _stake(uint256 amount) private nonReentrant {
+    if (_stakeBalances[msg.sender] == 0) {
+      _depositTime[msg.sender] = block.timestamp;
+    }
+    _lastUpdatedTime[msg.sender] = block.timestamp;
     _totalStaked += amount;
     _stakeBalances[msg.sender] += amount;
     stakingToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -156,9 +180,36 @@ contract TokenStaker is Ownable, ReentrancyGuard {
   }
 
   function _withdraw(uint256 amount) private nonReentrant {
+    require((block.timestamp - _depositTime[msg.sender]) 
+              >= lockupPeriod[getStakingTier(msg.sender)] * MONTH,
+              "Withdrawal not active"
+            );
+    _depositTime[msg.sender] = 0;
     _totalStaked -= amount;
     _stakeBalances[msg.sender] -= amount;
     stakingToken.safeTransfer(msg.sender, amount);
     emit Withdrawn(msg.sender, amount);
+  }
+
+  function uint2str(uint256 _i) private pure returns (string memory _uintAsString) {
+    if (_i == 0) {
+        return "0";
+    }
+    uint256 j = _i;
+    uint256 len;
+    while (j != 0) {
+        len++;
+        j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint256 k = len;
+    while (_i != 0) {
+        k = k-1;
+        uint8 temp = (48 + uint8(_i - _i / 10 * 10));
+        bytes1 b1 = bytes1(temp);
+        bstr[k] = b1;
+        _i /= 10;
+    }
+    return string(bstr);
   }
 }

@@ -50,7 +50,7 @@ const config: HardhatUserConfig = {
     path: './abis',
     runOnCompile: true,
     clear: true,
-    only: ['TokenStaker'],
+    only: ['TokenStaker', 'AirdropToken'],
   }
 };
 
