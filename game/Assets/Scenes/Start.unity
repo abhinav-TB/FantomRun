@@ -967,7 +967,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35.8
+  m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1528,7 +1528,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35.8
+  m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2086,8 +2086,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 084af8213d66c3d478aec1fba384d478, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coinContractAddress: 0x528f2afB130845Da94B5e53dC98d20536d9c0EBC
-  characterContractAddress: 0xCbB8Fe0933c74D7EDC4B19000F44278c41cF56Ad
+  coinContractAddress: '0xEFA42BF5AD8A70575A16aa171dbF8751d3A01337 '
+  characterContractAddress: '0xD5231C458c54A90b11477D3681B167934A6D3Ce9 '
   authPanelCanvas: {fileID: 318629458}
   authStatusText: {fileID: 1226316383}
   metaMaskAuthButton: {fileID: 1904482925}

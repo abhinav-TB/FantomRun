@@ -175,7 +175,7 @@ namespace Platformer.ThirdWeb {
             try {
                 string address = await _sdk.wallet.Connect(new WalletConnection() {
                     provider = provider,
-                    chainId = 80001
+                    chainId = 4002
                 });
 
                 authStatusText.text = $"Connected as {address}";
