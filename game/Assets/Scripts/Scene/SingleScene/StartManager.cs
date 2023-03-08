@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Platformer.ThirdWeb;
@@ -48,19 +49,17 @@ namespace Platformer.Scene {
             ThirdWebManager.HideAuthPanel();
             loadingCanvas.SetActive(true);
 
-            await ThirdWebManager.RefreshData();
-
+            StartCoroutine(RefreshData());
             UpdateCoinBalance();
-
-            loadingCanvas.SetActive(false);
-            startCanvas.SetActive(true);
         }
 
         private async void Update() {
 #if UNITY_EDITOR
             startCanvas.SetActive(true);
             loadingCanvas.SetActive(false);
-#else
+            return;
+#endif
+
             if (ThirdWebManager.ShouldDataBeRefreshed) {
                 if (ThirdWebManager.IsAuthenticated) {
                     await UpdateData();
@@ -72,7 +71,14 @@ namespace Platformer.Scene {
                     ThirdWebManager.ShowAuthPanel();
                 }
             }
-#endif
+        }
+
+        private IEnumerator RefreshData() {
+            ThirdWebManager.RefreshData();
+            yield return new WaitForSeconds(1);
+            loadingCanvas.SetActive(false);
+            startCanvas.SetActive(true);
+            yield return null;
         }
     }
 }

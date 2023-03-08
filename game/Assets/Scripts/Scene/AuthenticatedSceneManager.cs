@@ -14,8 +14,7 @@ namespace Platformer.Scene {
         public static void LoadScene(string sceneName) {
 #if UNITY_EDITOR
             _instance.StartCoroutine(_instance.LoadSceneAsync(sceneName));
-            return;
-#endif
+#else
             // TODO: Should I instead throw an exception if not authenticated.
             if (ThirdWebManager.IsAuthenticated) {
                 _instance.StartCoroutine(_instance.LoadSceneAsync(sceneName));
@@ -23,6 +22,7 @@ namespace Platformer.Scene {
             else {
                 _instance.StartCoroutine(_instance.LoadSceneAsync("Start"));
             }
+#endif
         }
 
         private void Awake() {

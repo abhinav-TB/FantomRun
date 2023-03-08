@@ -14,7 +14,6 @@ namespace Platformer.UI {
         [SerializeField] private GameObject progressUI;
         [SerializeField] private GameObject successUI;
         [SerializeField] private GameObject failureUI;
-        [SerializeField] private Button claimCoinsButton;
         [SerializeField] private Button menuButton;
         [SerializeField] private Button replayButton;
         [SerializeField] private Button nextButton;
@@ -31,33 +30,6 @@ namespace Platformer.UI {
             if (LevelManager.IsLastLevel) {
                 nextButton.gameObject.SetActive(false);
             }
-
-            claimCoinsButton.onClick.AddListener(async () => {
-                PlayerController player = Simulation.GetModel<PlatformerModel>().player;
-                int coinCount = player.Coins;
-
-                if (coinCount > 0) {
-                    claimCoinsUI.SetActive(false);
-                    progressUI.SetActive(true);
-
-                    bool result = await GetCoin(coinCount.ToString());
-
-                    progressUI.SetActive(false);
-
-                    if (result) {
-                        successUI.SetActive(true);
-                    }
-                    else {
-                        failureUI.SetActive(true);
-                    }
-                }
-                else {
-                    claimCoinsButton.gameObject.SetActive(false);
-                }
-
-                // TODO: Remove this if not needed when replay and next buttons are properly implemented
-                player.ResetCoins();
-            });
 
             menuButton.onClick.AddListener(() => {
                 ThirdWebManager.ShouldDataBeRefreshed = true;
@@ -85,13 +57,6 @@ namespace Platformer.UI {
         private void InitializeUI() {
             PlayerController player = Simulation.GetModel<PlatformerModel>().player;
             int coinCount = player.Coins;
-
-            if (coinCount > 0) {
-                claimCoinsButton.gameObject.SetActive(true);
-            }
-            else {
-                claimCoinsButton.gameObject.SetActive(false);
-            }
 
             claimCoinsUI.SetActive(true);
             progressUI.SetActive(false);

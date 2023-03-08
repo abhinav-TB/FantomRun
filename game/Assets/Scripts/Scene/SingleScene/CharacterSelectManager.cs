@@ -27,11 +27,10 @@ namespace Platformer.Scene {
             bool isAirdropCharacterOwner = ThirdWebManager.IsAirdropCharacterOwner();
 
             if (isAirdropCharacterOwner) {
-                Debug.Log("You own the airdrop character.");
                 getCharacterPanel.SetActive(false);
             }
             else {
-                getCharacterPanel.SetActive(true);
+                getCharacterPanel.SetActive(false);
             }
 
             var selectableCharacters = new List<SelectableCharacter>();

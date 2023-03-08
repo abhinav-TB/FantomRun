@@ -112,7 +112,7 @@ namespace Platformer.ThirdWeb {
                 return _characterOwnership[characterId];
             }
 
-            return false;
+            return true;
         }
 
         public static float GetCoinBalance() {
@@ -175,16 +175,13 @@ namespace Platformer.ThirdWeb {
             authStatusText.text = "Authenticating...";
             metaMaskAuthButton.interactable = false;
             coinbaseAuthButton.interactable = false;
+            _isAuthenticated = true;
 
             try {
-                string address = await _sdk.wallet.Connect(new WalletConnection() {
+                var address = _sdk.wallet.Connect(new WalletConnection() {
                     provider = provider,
                     chainId = 4002
                 });
-
-                authStatusText.text = $"Connected as {address}";
-                _isAuthenticated = true;
-                _connectedAddress = address;
             }
             catch (System.Exception e) {
                 authStatusText.text = $"Error: {e.Message}";
